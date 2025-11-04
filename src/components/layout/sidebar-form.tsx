@@ -11,33 +11,40 @@ import {
 import { Button } from "../ui/button";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { ReactNode } from "react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Trash2 } from "lucide-react";
+
 
 
 type SideBarFormProps = {
     title: string;
     children: ReactNode;
-    onSave: () => void;
+    onSave?: () => void;
+    onDelete?: () => void;
+    loading: boolean;
 }
 
 
-export function SideBarForm({ 
+export function SideBarForm({
     title,
-    children, 
-    onSave
+    children,
+    onSave,
+    onDelete,
+    loading
 }: SideBarFormProps) {
 
     const navigate = useNavigate();
     const location = useLocation();
-    
-    function handleCloseForm (open: boolean){
-        if (!open){
+
+    function handleCloseForm(open: boolean) {
+        if (!open) {
             const currentPath = location.pathname; //-> /categories/new
             const newPath = currentPath.substring(0, currentPath.lastIndexOf('/'))
             navigate(newPath);
         }
     }
-    
-    
+
+
     return (
         <Sheet open={true} onOpenChange={handleCloseForm}>
             <SheetTrigger>Open</SheetTrigger>
@@ -49,22 +56,45 @@ export function SideBarForm({
                     </SheetDescription>
                 </SheetHeader>
 
-                {children}
+                <div className="px-8">
+                    {children}
+                </div>
 
-                <SheetFooter>
+
+                <SheetFooter className="flex flex-row justify-between">
                     <div className="flex flex-row">
                         <Button
+                            type="button"
                             onClick={onSave}
+                            disabled={loading}
                         >Salvar</Button>
 
                         <SheetClose>
                             <Button
                                 variant='outline'
+                                disabled={loading}
                             >
                                 Cancelar
                             </Button>
                         </SheetClose>
                     </div>
+                    {onDelete && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant='destructive'
+                                    size='icon'
+                                    onClick={onDelete}
+                                >
+                                    <Trash2 />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Remover o registro</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    )}
+
                 </SheetFooter>
             </SheetContent>
         </Sheet>
